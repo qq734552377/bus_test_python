@@ -85,6 +85,22 @@ class UsbHost:
 
 class RTC:
     @classmethod
+    def open_out_1(cls):
+        return commonInput("on","output_1")
+
+    @classmethod
+    def close_out_1(cls):
+        return commonInput("off","output_1")
+
+    @classmethod
+    def open_out_2(cls):
+        return commonInput("on","output_2")
+
+    @classmethod
+    def close_out_2(cls):
+        return commonInput("off","output_2")
+
+    @classmethod
     def input_io(cls):
         return commonQuerry("input_io")
 

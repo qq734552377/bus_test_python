@@ -13,7 +13,89 @@ class TestItemState:
     fail = 'red'
     normal = 'grey'
 
-class TestName:
+class TestName(object):
+
+
+    input_1 = {
+        "name" : "Input1测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+    input_2 = {
+        "name" : "Input2测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+    input_3 = {
+        "name" : "Input3测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+    input_4 = {
+        "name" : "Input4测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+    input_5 = {
+        "name" : "Input5测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+    input_6 = {
+        "name" : "Input6测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+    input_7 = {
+        "name" : "Input7测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+    input_8 = {
+        "name" : "Input8测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+    input_9 = {
+        "name" : "Input9测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+    input_10 = {
+        "name" : "Input10测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+    input_11 = {
+        "name" : "Input11测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+
+
+    out_1 = {
+        "name" : "Out1测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+    out_2 = {
+        "name" : "Out2测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
     sdcard_test = {
         "name" : "SD卡测试",
         "testResult" : getTestResult,
@@ -152,3 +234,16 @@ class TestName:
         "testState" : TestItemState.normal,
         "widget" : ""
     }
+    inputs = [input_1,input_2,input_3,
+              input_4,input_5,input_6,
+              input_7,input_8,input_9,
+              input_10,input_11]
+
+    allTestItems = [input_1,input_2,input_3,input_4,input_5,
+                    input_6,input_7,input_8,input_9,input_10,
+                    input_11,out_1,out_2,sdcard_test,buzzer_test,
+                    red_led,yellow_led,green_led,power_voltage,rtc_battery_voltage,
+                    sound_record,port_ttymxc1,port_ttymxc2,port_ttyAVR0,temperature,
+                    meter,sim_card,gprs,gps,wifi_test,
+                    s_ram,bluetooth,port_ttymxc4,cap_voltage,supper_cap_power]
+
