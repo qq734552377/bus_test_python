@@ -139,7 +139,11 @@ class Sound:
 
     @classmethod
     def record(cls):
-        return "arecord -f cd w.wav"
+        return "arecord -f cd -d 10 /unit_tests/ucast_test.wav"
+
+    @classmethod
+    def play_record(cls):
+        return "aplay /unit_tests/ucast_test.wav"
 
 class Cpu:
     @classmethod

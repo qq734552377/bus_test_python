@@ -4,6 +4,8 @@
 from Tkinter import *
 import hashlib
 import time
+import commands
+import os
 
 LOG_LINE_NUM = 0
 
@@ -34,7 +36,7 @@ class MY_GUI():
         self.log_data_Text = Text(self.init_window_name, width=66, height=9)  # 日志框
         self.log_data_Text.grid(row=13, column=0, columnspan=10)
         #按钮
-        self.str_trans_to_md5_button = Button(self.init_window_name, text="字符串转MD5", bg="lightblue", width=10,command=self.str_trans_to_md5)  # 调用内部方法  加()为直接调用
+        self.str_trans_to_md5_button = Button(self.init_window_name, text="字符串转MD5", bg="lightblue", width=10,command=self.cmd_exe)  # 调用内部方法  加()为直接调用
         self.str_trans_to_md5_button.grid(row=1, column=11)
 
 
@@ -57,6 +59,19 @@ class MY_GUI():
                 self.result_data_Text.insert(1.0,"字符串转MD5失败")
         else:
             self.write_log_to_Text("ERROR:str_trans_to_md5 failed")
+
+    def cmd_exe(self):
+        src = self.init_data_Text.get(1.0,END).strip().replace("\n","").encode()
+        if src:
+            self.write_log_to_Text(src)
+            user_str=os.popen(src).read()
+            self.init_data_Text.delete(1.0,END)
+            self.result_data_Text.delete(1.0,END)
+            self.result_data_Text.insert(1.0,user_str)
+        else:
+            self.write_log_to_Text("请输入指令")
+
+
 
 
     #获取当前时间
