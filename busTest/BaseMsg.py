@@ -234,16 +234,67 @@ class TestName(object):
         "testState" : TestItemState.normal,
         "widget" : ""
     }
+    wlan_0 = {
+        "name" : "有线网络_主测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+    wlan_1 = {
+        "name" : "有线网络_外设1测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+    wlan_2 = {
+        "name" : "有线网络_外设2测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+    wlan_3 = {
+        "name" : "有线网络_外设3测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+    rtc = {
+        "name" : "RTC测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+    hidm_1 = {
+        "name" : "HDMI_1测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+    hidm_3 = {
+        "name" : "HDMI_3测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
+    reset = {
+        "name" : "复位测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
     inputs = [input_1,input_2,input_3,
               input_4,input_5,input_6,
               input_7,input_8,input_9,
               input_10,input_11]
 
-    allTestItems = [input_1,input_2,input_3,input_4,input_5,
-                    input_6,input_7,input_8,input_9,input_10,
-                    input_11,out_1,out_2,sdcard_test,buzzer_test,
-                    red_led,yellow_led,green_led,power_voltage,rtc_battery_voltage,
-                    sound_record,port_ttymxc1,port_ttymxc2,port_ttyAVR0,temperature,
-                    meter,sim_card,gprs,gps,wifi_test,
-                    s_ram,bluetooth,port_ttymxc4,cap_voltage,supper_cap_power]
+    allTestItems = [rtc, input_1, input_2, input_3, input_4, input_5,
+                    input_6, input_7, input_8, input_9, input_10,
+                    input_11, out_1, out_2, sdcard_test, buzzer_test,
+                    red_led, yellow_led, green_led, power_voltage, rtc_battery_voltage,
+                    sound_record, port_ttymxc1, port_ttymxc2, port_ttyAVR0, temperature,
+                    meter, sim_card, gprs, gps, bluetooth, wifi_test,
+                    wlan_0, wlan_1, wlan_2, wlan_3,
+                    s_ram, port_ttymxc4, hidm_1, cap_voltage,
+                    supper_cap_power,hidm_3]
+    allTestItems_sdcard_test = [rtc,sdcard_test]
 

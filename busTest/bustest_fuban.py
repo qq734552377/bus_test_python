@@ -14,7 +14,7 @@ import datetime
 
 testStr = "This is test message!"
 
-sdTestPath = '''/run/media/mmcblk2p1/pids_sd_test.txt'''
+sdTestPath = '''/run/media/mmcblk2p1/pids_sd_test_fuban.txt'''
 sramPath = '''/sys/devices/platform/avrsram/sram'''
 MIME = ''
 
@@ -57,23 +57,22 @@ def getMIME():
 def getAllTestResult():
     result = []
     result.append("MAC：" + getCpuNumber() + "\n")
-    result.append("MIME：" + getMIME() + "\n")
-    for item in TestName.allTestItems:
+    for item in TestName.allTestItems_sdcard_test:
         result.append(item["name"] + "：" + item["testResult"](item["testState"]) + "\n")
     return "".join(result)
 
 def getRecoverData():
     result = []
-    for item in TestName.allTestItems:
+    for item in TestName.allTestItems_sdcard_test:
         result.append(item["testState"])
     return result
 
 
 def getSaveResultPath(fileName):
-    return "pids_test_result/%s.txt"%fileName
+    return "pids_test_result_subpanel/%s.txt"%fileName
 
 def getRecoverDataPath(fileName):
-    return "pids_test_result/%s.pkl"%fileName
+    return "pids_test_result_subpanel/%s.pkl"%fileName
 
 #获取当前时间
 def get_current_time():
@@ -92,7 +91,6 @@ def writeWithPickle(path,data):
     output = open(path, 'wb')
     # Pickle dictionary using protocol 0.
     pickle.dump(data, output)
-    output.flush()
     output.close()
     pass
 
@@ -110,9 +108,8 @@ def readWithPickle(path):
 def writeToFile(path,data):
     try :
         write_log_to_Text(path)
-        f = open(path,'w')
+        f = open(path,'w+')
         f.writelines(data)
-        f.flush()
         f.close()
     except Exception:
         return
@@ -123,7 +120,6 @@ def writeToFileAppened(path,data):
     try:
         f = open(path,'a+')
         f.writelines(data)
-        f.flush()
         f.close()
     except Exception:
         return
@@ -133,7 +129,7 @@ def writeToFileAppened(path,data):
 def readFile(path):
     if not os.path.exists(path):
         return ""
-    f = open(path,'r')
+    f = open(path,'r+')
     try:
         data = f.read()
         # write_log_to_Text(data)
@@ -549,7 +545,7 @@ class TestFun:
     def testGPS(cls):
         cmd(GPS.open_power())
         time.sleep(5)
-        gpsSer = serial.Serial(MySerial.port_ttymxc3,9600,timeout=5)
+        gpsSer = serial.Serial(MySerial.port_ttymxc3,9600)
         testNum = 300
         i = 0
         while i < testNum:
@@ -690,7 +686,7 @@ class TestFun:
     @classmethod
     def testCom4(cls):
         try:
-            com4 = serial.Serial(MySerial.port_ttymxc4,115200,timeout=2)
+            com4 = serial.Serial(MySerial.port_ttymxc4,115200)
             com4.write(testStr)
             time.sleep(1)
             result = com4.read(len(testStr))
@@ -721,12 +717,7 @@ class TestFun:
             testSucessed(TestName.hidm_3)
         else:
             testFailed(TestName.hidm_3)
-        TestFun.testReset()
         pass
-
-    @classmethod
-    def testReset(cls):
-        showinfo('Prompt',"测试完成请点击保存并退出，等程序退出以后按复位键")
 
     @classmethod
     def quitAndSave(cls):
@@ -738,9 +729,6 @@ class TestFun:
     @classmethod
     def beforeQuit(cls,event=None):
         print "退出了"
-        cmd(LedCtr.closeLed(LedCtr.red_led))
-        cmd(LedCtr.closeLed(LedCtr.yellow_led))
-        cmd(LedCtr.closeLed(LedCtr.green_led))
         pass
 
     @classmethod
@@ -756,50 +744,23 @@ class TestFun:
 
 
 def test_all_init():
-    cmd(LedCtr.openLed(LedCtr.red_led))
-    cmd(LedCtr.openLed(LedCtr.yellow_led))
-    cmd(LedCtr.openLed(LedCtr.green_led))
-
-    cmd(ThreeG.open_power)
-
     mac = getCpuNumber()
     recoverData = readWithPickle(getRecoverDataPath(mac))
     if recoverData != "":
         i = 0
-        for item in TestName.allTestItems:
+        for item in TestName.allTestItems_sdcard_test:
             item["testState"] = recoverData[i]
             item["widget"].setState(recoverData[i])
             i = i + 1
+    autoTest()
+
     pass
 
 def autoTest():
     autoFuns = [
         TestFun.testRTC,
-        TestFun.testSupperCapPower,
-        TestFun.testInput,
-        TestFun.testOut1,
-        TestFun.testOut2,
         TestFun.testSdCard,
-        TestFun.testBuzzer,
-        TestFun.testAllLed,
-        TestFun.testPowerVoltage,
-        TestFun.testRTCBatteryVoltage,
-        TestFun.testCapVoltage,
-        TestFun.testSound_Record,
-        TestFun.testPort,
-        TestFun.testTemperature,
-        TestFun.testMeter,
-        TestFun.testSimCard,
-        TestFun.testGPS,
-        TestFun.testBluetooth,
-        TestFun.testWlan_0,
-        TestFun.testWlan_1,
-        TestFun.testWlan_2,
-        TestFun.testWlan_3,
-        TestFun.testSram,
-        TestFun.testCom4,
-        TestFun.testHidm_1,
-        TestFun.testHidm_3
+        TestFun.saveSomething
     ]
     for runFun in autoFuns:
         runFun()
@@ -808,7 +769,7 @@ def gui_start():
     global init_window
     init_window = Tk() #实例化出一个父窗口
     init_window.geometry('1080x850+25+25')  #初始化窗口大小
-    init_window.title("PIDS Test")
+    init_window.title("PIDS Subpanel Test")
     title = Label(init_window,text = "工厂测试项目")
     title.grid(row = 0,column = 0,padx = 90,pady=15)
 
@@ -852,99 +813,10 @@ def gui_start():
 
     rtc = TestItem(fram1_0,TestName.rtc["name"],TestName.rtc["testState"],TestFun.testRTC)
     TestName.rtc["widget"] = rtc
-    cap_power = TestItem(fram1_0,TestName.supper_cap_power["name"],TestName.supper_cap_power["testState"],TestFun.testSupperCapPower)
-    TestName.supper_cap_power["widget"] = cap_power
-    input1 = TestItem(fram1_0,TestName.input_1["name"],TestName.input_1["testState"],TestFun.testInput)
-    TestName.input_1["widget"] = input1
-    input2 = TestItem(fram1_0,TestName.input_2["name"],TestName.input_2["testState"])
-    TestName.input_2["widget"] = input2
-    input3 = TestItem(fram1_0,TestName.input_3["name"],TestName.input_3["testState"])
-    TestName.input_3["widget"] = input3
-    input4 = TestItem(fram1_0,TestName.input_4["name"],TestName.input_4["testState"])
-    TestName.input_4["widget"] = input4
-    input5 = TestItem(fram1_0,TestName.input_5["name"],TestName.input_5["testState"])
-    TestName.input_5["widget"] = input5
-    input6 = TestItem(fram1_0,TestName.input_6["name"],TestName.input_6["testState"])
-    TestName.input_6["widget"] = input6
-    input7 = TestItem(fram1_0,TestName.input_7["name"],TestName.input_7["testState"])
-    TestName.input_7["widget"] = input7
-    input8 = TestItem(fram1_0,TestName.input_8["name"],TestName.input_8["testState"])
-    TestName.input_8["widget"] = input8
-
-    input9 = TestItem(fram1_1,TestName.input_9["name"],TestName.input_9["testState"])
-    TestName.input_9["widget"] = input9
-    input10 = TestItem(fram1_1,TestName.input_10["name"],TestName.input_10["testState"])
-    TestName.input_10["widget"] = input10
-    input11 = TestItem(fram1_1,TestName.input_11["name"],TestName.input_11["testState"])
-    TestName.input_11["widget"] = input11
-    out1 = TestItem(fram1_1,TestName.out_1["name"],TestName.out_1["testState"],TestFun.testOut1)
-    TestName.out_1["widget"] = out1
-    out2 = TestItem(fram1_1,TestName.out_2["name"],TestName.out_2["testState"],TestFun.testOut2)
-    TestName.out_2["widget"] = out2
-    sd = TestItem(fram1_1,TestName.sdcard_test["name"], TestName.sdcard_test["testState"], TestFun.testSdCard)
-    TestName.sdcard_test["widget"] = sd
-    buzzer = TestItem(fram1_1,TestName.buzzer_test["name"],TestName.buzzer_test["testState"],TestFun.testBuzzer)
-    TestName.buzzer_test["widget"] = buzzer
-    red_led = TestItem(fram1_1,TestName.red_led["name"], TestName.red_led["testState"], TestFun.testRedLed)
-    TestName.red_led["widget"] = red_led
-    yellow_led = TestItem(fram1_1,TestName.yellow_led["name"], TestName.yellow_led["testState"], TestFun.testYellowLed)
-    TestName.yellow_led["widget"] = yellow_led
-    green_led = TestItem(fram1_1,TestName.green_led["name"], TestName.green_led["testState"], TestFun.testGreenLed)
-    TestName.green_led["widget"] = green_led
-
-    power_voltage = TestItem(fram1_2,TestName.power_voltage["name"],TestName.power_voltage["testState"],TestFun.testPowerVoltage)
-    TestName.power_voltage["widget"] = power_voltage
-    rtc_battery_voltage = TestItem(fram1_2,TestName.rtc_battery_voltage["name"],TestName.rtc_battery_voltage["testState"],TestFun.testRTCBatteryVoltage)
-    TestName.rtc_battery_voltage["widget"] = rtc_battery_voltage
-    cap = TestItem(fram1_2,TestName.cap_voltage["name"],TestName.cap_voltage["testState"],TestFun.testCapVoltage)
-    TestName.cap_voltage["widget"] = cap
-    sound_record = TestItem(fram1_2,TestName.sound_record["name"],TestName.sound_record["testState"],TestFun.testSound_Record)
-    TestName.sound_record["widget"] = sound_record
-    mxc1 = TestItem(fram1_2,TestName.port_ttymxc1["name"],TestName.port_ttymxc1["testState"],TestFun.testPort)
-    TestName.port_ttymxc1["widget"] = mxc1
-    mxc2 = TestItem(fram1_2,TestName.port_ttymxc2["name"],TestName.port_ttymxc2["testState"])
-    TestName.port_ttymxc2["widget"] = mxc2
-    avg0 = TestItem(fram1_2,TestName.port_ttyAVR0["name"],TestName.port_ttyAVR0["testState"])
-    TestName.port_ttyAVR0["widget"] = avg0
-    temp = TestItem(fram1_2,TestName.temperature["name"],TestName.temperature["testState"],TestFun.testTemperature)
-    TestName.temperature["widget"] = temp
-    meter = TestItem(fram1_2,TestName.meter["name"],TestName.meter["testState"],TestFun.testMeter)
-    TestName.meter["widget"] = meter
-    simcard = TestItem(fram1_2,TestName.sim_card["name"],TestName.sim_card["testState"],TestFun.testSimCard)
-    TestName.sim_card["widget"] = simcard
-
-    gprs = TestItem(fram1_3,TestName.gprs["name"],TestName.gprs["testState"],TestFun.testGPRS)
-    TestName.gprs["widget"] = gprs
-    gps = TestItem(fram1_3,TestName.gps["name"],TestName.gps["testState"],TestFun.testGPS)
-    TestName.gps["widget"] = gps
-    bluetooth = TestItem(fram1_3,TestName.bluetooth["name"],TestName.bluetooth["testState"],TestFun.testBluetooth)
-    TestName.bluetooth["widget"] = bluetooth
-    wifi = TestItem(fram1_3,TestName.wifi_test["name"],TestName.wifi_test["testState"],TestFun.testWifi)
-    TestName.wifi_test["widget"] = wifi
-    wlan_0 = TestItem(fram1_3,TestName.wlan_0["name"],TestName.wlan_0["testState"],TestFun.testWlan_0)
-    TestName.wlan_0["widget"] = wlan_0
-    wlan_1 = TestItem(fram1_3,TestName.wlan_1["name"],TestName.wlan_1["testState"],TestFun.testWlan_1)
-    TestName.wlan_1["widget"] = wlan_1
-    wlan_2 = TestItem(fram1_3,TestName.wlan_2["name"],TestName.wlan_2["testState"],TestFun.testWlan_2)
-    TestName.wlan_2["widget"] = wlan_2
-    wlan_3 = TestItem(fram1_3,TestName.wlan_3["name"],TestName.wlan_3["testState"],TestFun.testWlan_3)
-    TestName.wlan_3["widget"] = wlan_3
-    sram = TestItem(fram1_3,TestName.s_ram["name"],TestName.s_ram["testState"],TestFun.testSram)
-    TestName.s_ram["widget"] = sram
-    mxc4 = TestItem(fram1_3, TestName.port_ttymxc4["name"], TestName.port_ttymxc4["testState"],TestFun.testCom4)
-    TestName.port_ttymxc4["widget"] = mxc4
-
-    hidm_1 = TestItem(fram1_4, TestName.hidm_1["name"], TestName.hidm_1["testState"], TestFun.testHidm_1)
-    TestName.hidm_1["widget"] = hidm_1
-    hidm_3 = TestItem(fram1_4, TestName.hidm_3["name"], TestName.hidm_3["testState"], TestFun.testHidm_3)
-    TestName.hidm_3["widget"] = hidm_3
+    sdcard = TestItem(fram1_0,TestName.sdcard_test["name"],TestName.sdcard_test["testState"],TestFun.testSdCard)
+    TestName.sdcard_test["widget"] = sdcard
 
 
-
-
-    # write_log_to_Text(BackLight.setLight(2))
-    # write_log_to_Text(GPS.gps_antenna_status())
-    # showerror("eeee")
 
     test_all_init()
     init_window.mainloop()

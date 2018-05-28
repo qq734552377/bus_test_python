@@ -2,6 +2,8 @@
 # -*- coding: UTF-8 -*-
 
 import commands
-user_str=commands.getoutput('ls /user')
+str = '$GPRMC,003634.00,V,,,,,,,,,,N*7F'
 
-print user_str
+
+
+print 511/10

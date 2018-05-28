@@ -13,7 +13,7 @@ class Wifi:
     open_power = commonInput("on","wifi_power")
     install_wifi_driver = '''insmod /etc/rtl8723bu.ko'''
     start = '''wpa_supplicant -Dwext -iwlan0 -c/etc/wpa_rtl8723bu.conf -B'''
-    scan = ['''wpa_cli -iwlan0 scan''']
+    scan = '''wpa_cli -iwlan0 scan'''
     scan_results = '''wpa_cli -iwlan0 scan_results'''
     list = '''wpa_cli -iwlan0 list_network'''
     connect = [
@@ -22,6 +22,7 @@ class Wifi:
         "wpa_cli -iwlan0 add_network 0 psk '%s'" % (password),
         "wpa_cli -iwlan0 select_network 0"
     ]
+    stop = "killall wpa_supplicant"
     get_ip = "dhclient wlan0"
     close_power = commonInput("off","wifi_power")
     uninstall_wifi_driver = '''rmmod rtl8723bu'''
@@ -143,6 +144,15 @@ class RTC:
     @classmethod
     def pulse_count_after_power_on(cls):
         return commonQuerry("pulse_sum")
+
+    @classmethod
+    def setRTCTime1(cls,time):
+        # 时间格式 2017-08-22 15:22:30
+        return 'date -s "%s"'%time
+
+    @classmethod
+    def setRTCTime2(cls):
+        return 'hwclock --systohc'
 
 class Sound:
     @classmethod
