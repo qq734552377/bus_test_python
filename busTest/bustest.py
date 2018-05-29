@@ -17,6 +17,7 @@ testStr = "This is test message!"
 sdTestPath = '''/run/media/mmcblk2p1/pids_sd_test.txt'''
 sramPath = '''/sys/devices/platform/avrsram/sram'''
 MIME = ''
+sync = "sync"
 
 def cmd(cmdStr):
     user_str = os.popen(cmdStr).read().strip()
@@ -89,21 +90,28 @@ def write_log_to_Text(logmsg):
 
 #序列化写入文件
 def writeWithPickle(path,data):
-    output = open(path, 'wb')
-    # Pickle dictionary using protocol 0.
-    pickle.dump(data, output)
-    output.flush()
-    output.close()
+    try:
+        output = open(path, 'wb')
+        # Pickle dictionary using protocol 0.
+        pickle.dump(data, output)
+        output.flush()
+        output.close()
+        cmd(sync)
+    except Exception:
+        return
     pass
 
 #读取序列化文件
 def readWithPickle(path):
     if not os.path.exists(path):
         return ""
-    pkl_file = open(path, 'rb')
-    data = pickle.load(pkl_file)
-    pkl_file.close()
-    return data
+    try:
+        pkl_file = open(path, 'rb')
+        data = pickle.load(pkl_file)
+        pkl_file.close()
+        return data
+    except Exception:
+        return ""
     pass
 
 # 写入文件
@@ -114,6 +122,7 @@ def writeToFile(path,data):
         f.writelines(data)
         f.flush()
         f.close()
+        cmd(sync)
     except Exception:
         return
         pass
@@ -125,6 +134,7 @@ def writeToFileAppened(path,data):
         f.writelines(data)
         f.flush()
         f.close()
+        cmd(sync)
     except Exception:
         return
         pass
@@ -949,5 +959,5 @@ def gui_start():
     test_all_init()
     init_window.mainloop()
 
-
-gui_start()
+if __name__ == "__main__":
+    gui_start()
