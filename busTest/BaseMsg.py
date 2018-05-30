@@ -282,6 +282,12 @@ class TestName(object):
         "testState" : TestItemState.normal,
         "widget" : ""
     }
+    gprs_signal = {
+        "name" : "GPRS信号强度测试",
+        "testResult" : getTestResult,
+        "testState" : TestItemState.normal,
+        "widget" : ""
+    }
     inputs = [input_1,input_2,input_3,
               input_4,input_5,input_6,
               input_7,input_8,input_9,
@@ -295,6 +301,6 @@ class TestName(object):
                     meter, sim_card, gprs, gps, bluetooth, wifi_test,
                     wlan_0, wlan_1, wlan_2, wlan_3,
                     s_ram, port_ttymxc4, hidm_1, cap_voltage,
-                    supper_cap_power,hidm_3]
+                    supper_cap_power,hidm_3,gprs_signal]
     allTestItems_sdcard_test = [rtc,sdcard_test]
 

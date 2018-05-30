@@ -650,11 +650,11 @@ class TestFun:
     def testRTC(cls):
         if TestName.rtc["testState"] == TestItemState.success:
             return
-        testTime = 'Fri May 25 00:00:00 2018'
-        setTime = '2018-05-25 00:00:00'
+        testTime = 'Wed May 30 00:00:00 2018'
+        setTime = '2018-05-30 00:00:00'
         rtcTime = cmd("hwclock")
         if rtcTime == '':
-            rtcTime = "Fri May 25 00:00:00 1970 "
+            rtcTime = "Mon May 25 00:00:00 1970 "
         rtcTime = rtcTime[:len(testTime)]
         formatRtcTime = datetime.datetime.strptime(rtcTime, '%a %b %d %H:%M:%S %Y').strftime("%Y-%m-%d")
         if formatRtcTime == setTime[:10]:
@@ -762,6 +762,7 @@ def test_all_init():
             item["testState"] = recoverData[i]
             item["widget"].setState(recoverData[i])
             i = i + 1
+    title.config(text = "工厂测试项目\nMac:" + getCpuNumber())
     autoTest()
 
     pass
@@ -780,7 +781,8 @@ def gui_start():
     init_window = Tk() #实例化出一个父窗口
     init_window.geometry('1080x850+25+25')  #初始化窗口大小
     init_window.title("PIDS Subpanel Test")
-    title = Label(init_window,text = "工厂测试项目")
+    global title
+    title = Label(init_window,text = "工厂测试项目（副板）\n" )
     title.grid(row = 0,column = 0,padx = 90,pady=15)
 
     fram1 = Frame(init_window)

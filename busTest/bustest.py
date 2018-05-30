@@ -47,13 +47,19 @@ def getCpuNumber():
     return "-".join(mac)
 
 def getMIME():
-    at = serial.Serial(MySerial.port_ttyUSB2,115200,timeout=2)
-    at.write("AT+CGSN\r\n")
-    at.flush()
-    mime = at.read(100)
-    mime = mime.replace("\r","").split("\n")[1]
-    at.close()
-    return mime
+    try:
+        at = serial.Serial(MySerial.port_ttyUSB2,115200,timeout=2)
+        at.write("AT+CGSN\r\n")
+        at.flush()
+        mime = at.read(100)
+        mime = mime.replace("\r","").split("\n")[1]
+        at.close()
+        return mime
+    except Exception:
+        mime = "no data"
+        return mime
+        pass
+
 
 def getAllTestResult():
     result = []
@@ -531,7 +537,8 @@ class TestFun:
     @classmethod
     def testGPRS(cls):
         try:
-            cmd(ThreeG.open_power)
+            # cmd(ThreeG.open_power)
+
             time.sleep(5)
             cmd(ThreeG.start)
             time.sleep(5)
@@ -548,6 +555,7 @@ class TestFun:
             # cmd(ThreeG.close_power)
             # time.sleep(2)
             cmd("ifconfig eth0 up")
+
         except Exception:
             write_log_to_Text("sim_card异常退出" )
             testFailed(TestName.sim_card)
@@ -616,7 +624,7 @@ class TestFun:
 
     @classmethod
     def testWlan_1(cls):
-        isLight = askquestion("Prompt","指示灯是否亮？")
+        isLight = askquestion("Prompt","指示灯是否都亮？")
         if  isLight == 'yes':
             if ping("192.168.0.101"):
                 testFailed(TestName.wlan_1)
@@ -628,7 +636,7 @@ class TestFun:
 
     @classmethod
     def testWlan_2(cls):
-        isLight = askquestion("Prompt","指示灯是否亮？")
+        isLight = 'yes'
         if  isLight == 'yes':
             if ping("192.168.0.102"):
                 testFailed(TestName.wlan_2)
@@ -640,7 +648,7 @@ class TestFun:
 
     @classmethod
     def testWlan_3(cls):
-        isLight = askquestion("Prompt","指示灯是否亮？")
+        isLight = 'yes'
         if  isLight == 'yes':
             if ping("192.168.0.103"):
                 testFailed(TestName.wlan_3)
@@ -654,11 +662,11 @@ class TestFun:
     def testRTC(cls):
         if TestName.rtc["testState"] == TestItemState.success:
             return
-        testTime = 'Fri May 25 00:00:00 2018'
-        setTime = '2018-05-25 00:00:00'
+        testTime = 'Wed May 30 00:00:00 2018'
+        setTime = '2018-05-30 00:00:00'
         rtcTime = cmd("hwclock")
         if rtcTime == '':
-            rtcTime = "Fri May 25 00:00:00 1970 "
+            rtcTime = "Mon May 25 00:00:00 1970 "
         rtcTime = rtcTime[:len(testTime)]
         formatRtcTime = datetime.datetime.strptime(rtcTime, '%a %b %d %H:%M:%S %Y').strftime("%Y-%m-%d")
         if formatRtcTime == setTime[:10]:
@@ -724,6 +732,34 @@ class TestFun:
         pass
 
     @classmethod
+    def testGPRSSignal(cls):
+        try:
+            results = []
+            at = serial.Serial(MySerial.port_ttyUSB2,115200,timeout=2)
+            for i in range(5):
+                at.write("AT+CSQ\r\n")
+                at.flush()
+                mime = at.read(100)
+                mime = mime.replace("\r","").split("\n")[1].split(",")[0].split(":")[1].strip()
+                results.append(mime)
+            writeToFile("signal.txt",results)
+            at.close()
+            sumSignal = 0
+            for lev in results:
+                oneSignal = int(lev)
+                if oneSignal == 99:
+                    oneSignal = 0
+                sumSignal = sumSignal + oneSignal
+            write_log_to_Text("GPRS信号总值为：" + sumSignal)
+            if sumSignal > 69 :
+                testSucessed(TestName.gprs_signal)
+            else:
+                testFailed(TestName.gprs_signal)
+        except Exception:
+            testFailed(TestName.gprs_signal)
+        pass
+
+    @classmethod
     def testHidm_3(cls):
         showinfo("Prompt","请将HIDM线拔下插入HIDM_3口")
         isShow = askquestion('Prompt',"看是否显示？")
@@ -737,6 +773,10 @@ class TestFun:
     @classmethod
     def testReset(cls):
         showinfo('Prompt',"测试完成请点击保存并退出，等程序退出以后按复位键")
+
+    @classmethod
+    def getMIMEToShow(self0):
+        title.config(text = "工厂测试项目\nMac:" + getCpuNumber() + "\nMIME:" + getMIME())
 
     @classmethod
     def quitAndSave(cls):
@@ -780,6 +820,8 @@ def test_all_init():
             item["testState"] = recoverData[i]
             item["widget"].setState(recoverData[i])
             i = i + 1
+
+    title.config(text = "工厂测试项目\nMac:" + getCpuNumber())
     pass
 
 def autoTest():
@@ -808,18 +850,28 @@ def autoTest():
         TestFun.testWlan_3,
         TestFun.testSram,
         TestFun.testCom4,
+        TestFun.testGPRSSignal,
         TestFun.testHidm_1,
-        TestFun.testHidm_3
+        TestFun.testHidm_3,
+        TestFun.getMIMEToShow
     ]
     for runFun in autoFuns:
         runFun()
+
+def clearState():
+    for item in TestName.allTestItems:
+        item["testState"] = TestItemState.normal
+        item["widget"].setState(TestItemState.normal)
+    TestFun.saveSomething()
+    pass
 
 def gui_start():
     global init_window
     init_window = Tk() #实例化出一个父窗口
     init_window.geometry('1080x850+25+25')  #初始化窗口大小
     init_window.title("PIDS Test")
-    title = Label(init_window,text = "工厂测试项目")
+    global title
+    title = Label(init_window,text = "工厂测试项目" )
     title.grid(row = 0,column = 0,padx = 90,pady=15)
 
     fram1 = Frame(init_window)
@@ -844,6 +896,8 @@ def gui_start():
     fram4 = Frame(init_window)
     startButton = Button(fram4,text = "开 始 测 试",bg = "#22D911",command = autoTest)
     startButton.pack(side = "left",pady = 20,padx = 80)
+    clearButton = Button(fram4,text = "清 除 状 态",bg = "#cccccc",command = clearState)
+    clearButton.pack(side = "left",pady = 20,padx = 40)
     exitButton = Button(fram4, text = "退出并保存", bg = "#cccccc", command = TestFun.quitAndSave)
     exitButton.pack(side = "right",pady = 20,padx = 40)
     fram4.grid(row = 2,column =0,sticky ="W")
@@ -944,10 +998,13 @@ def gui_start():
     mxc4 = TestItem(fram1_3, TestName.port_ttymxc4["name"], TestName.port_ttymxc4["testState"],TestFun.testCom4)
     TestName.port_ttymxc4["widget"] = mxc4
 
+    gprs_signal = TestItem(fram1_4, TestName.gprs_signal["name"], TestName.gprs_signal["testState"], TestFun.testGPRSSignal)
+    TestName.gprs_signal["widget"] = gprs_signal
     hidm_1 = TestItem(fram1_4, TestName.hidm_1["name"], TestName.hidm_1["testState"], TestFun.testHidm_1)
     TestName.hidm_1["widget"] = hidm_1
     hidm_3 = TestItem(fram1_4, TestName.hidm_3["name"], TestName.hidm_3["testState"], TestFun.testHidm_3)
     TestName.hidm_3["widget"] = hidm_3
+    mime = TestItem(fram1_4, "获取MIME", TestItemState.normal, TestFun.getMIMEToShow)
 
 
 
