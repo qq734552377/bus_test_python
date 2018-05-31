@@ -20,10 +20,14 @@ MIME = ''
 sync = "sync"
 
 def cmd(cmdStr):
-    user_str = os.popen(cmdStr).read().strip()
-    if user_str != '':
-        write_log_to_Text(user_str.strip() + "<<<")
-    return user_str
+    try:
+        user_str = os.popen(cmdStr).read().strip()
+        if user_str != '':
+            write_log_to_Text(user_str.strip() + "<<<")
+        return user_str
+    except Exception:
+        write_log_to_Text("执行命令行出错<<<")
+        return "执行命令行出错"
 
 def cmdIsFailed(cmdStr):
     return os.system(cmdStr)
@@ -426,16 +430,19 @@ class TestFun:
 
     @classmethod
     def testSound_Record(cls):
-        cmd(Sound.record())
-        isListened = askquestion("Prompt","是否播放录音？")
-        if isListened == "yes":
-            cmd(Sound.play_record())
-            isSuccess = askquestion("Prompt","是否听见录音？")
-            if isSuccess == "yes":
-                testSucessed(TestName.sound_record)
+        try:
+            cmd(Sound.record())
+            isListened = askquestion("Prompt","是否播放录音？")
+            if isListened == "yes":
+                cmd(Sound.play_record())
+                isSuccess = askquestion("Prompt","是否听见录音？")
+                if isSuccess == "yes":
+                    testSucessed(TestName.sound_record)
+                else:
+                    testFailed(TestName.sound_record)
             else:
                 testFailed(TestName.sound_record)
-        else:
+        except Exception:
             testFailed(TestName.sound_record)
         pass
 
