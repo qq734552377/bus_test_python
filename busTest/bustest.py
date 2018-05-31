@@ -742,7 +742,7 @@ class TestFun:
                 mime = at.read(100)
                 mime = mime.replace("\r","").split("\n")[1].split(",")[0].split(":")[1].strip()
                 results.append(mime)
-            writeToFile("signal.txt",results)
+            writeToFile("signal.txt","-".join(results))
             at.close()
             sumSignal = 0
             for lev in results:
@@ -750,7 +750,7 @@ class TestFun:
                 if oneSignal == 99:
                     oneSignal = 0
                 sumSignal = sumSignal + oneSignal
-            write_log_to_Text("GPRS信号总值为：" + sumSignal)
+            write_log_to_Text("GPRS信号总值为：" + str(sumSignal))
             if sumSignal > 69 :
                 testSucessed(TestName.gprs_signal)
             else:
