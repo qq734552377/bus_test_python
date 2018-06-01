@@ -203,7 +203,8 @@ class Bluetooth:
 class SomeUseCmd:
     @classmethod
     def getSysVersion(cls):
-        return "echo $BUILDID"
+    # /return "echo $BUILDID"
+        return 'grep "BUILDID" /etc/profile | cut -f 2 -d "="'
 
     @classmethod
     def getCpuNumber(cls):
