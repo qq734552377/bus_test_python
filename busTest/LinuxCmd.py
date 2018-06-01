@@ -199,3 +199,25 @@ class Bluetooth:
     @classmethod
     def scan(cls):
         return "hcitool scan"
+
+class SomeUseCmd:
+    @classmethod
+    def getSysVersion(cls):
+        return "echo $BUILDID"
+
+    @classmethod
+    def getCpuNumber(cls):
+        return "cat /proc/cmdline"
+
+    @classmethod
+    def getETH0Down(cls):
+        return "ifconfig eth0 down"
+
+    @classmethod
+    def getETH0Up(cls):
+        return "ifconfig eth0 up"
+
+    @classmethod
+    def getDate(cls):
+        return "hwclock"
+

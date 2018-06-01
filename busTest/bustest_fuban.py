@@ -34,7 +34,7 @@ def ping(ipadress):
 def getCpuNumber():
     anchor = "serialno="
     length = 10
-    str = cmd("cat /proc/cmdline")
+    str = cmd(SomeUseCmd.getCpuNumber())
     # str = "serialno=ea1a1b1c1d1e"
     if str == '':
         return 'no_mac_result'
@@ -45,6 +45,12 @@ def getCpuNumber():
         mac.append(str[i-2:i].upper())
         pass
     return "-".join(mac)
+
+def getSysVersion():
+    write_log_to_Text("開始读取sysversion")
+    re = cmd(SomeUseCmd.getSysVersion())
+    write_log_to_Text("结果--》" + re)
+    return re
 
 def getMIME():
     at = serial.Serial(MySerial.port_ttyUSB2,115200,timeout=2)
@@ -531,7 +537,7 @@ class TestFun:
             time.sleep(5)
             cmd(ThreeG.start)
             time.sleep(5)
-            cmd("ifconfig eth0 down")
+            cmd(SomeUseCmd.getETH0Down())
             time.sleep(5)
             if ping("www.baidu.com"):
                 testFailed(TestName.sim_card)
@@ -543,7 +549,7 @@ class TestFun:
             time.sleep(2)
             # cmd(ThreeG.close_power)
             # time.sleep(2)
-            cmd("ifconfig eth0 up")
+            cmd(SomeUseCmd.getETH0Up())
         except Exception:
             write_log_to_Text("sim_card异常退出" )
             testFailed(TestName.sim_card)
@@ -652,7 +658,7 @@ class TestFun:
             return
         testTime = 'Wed May 30 00:00:00 2018'
         setTime = '2018-05-30 00:00:00'
-        rtcTime = cmd("hwclock")
+        rtcTime = cmd(SomeUseCmd.getDate())
         if rtcTime == '':
             rtcTime = "Mon May 25 00:00:00 1970 "
         rtcTime = rtcTime[:len(testTime)]
@@ -662,7 +668,7 @@ class TestFun:
         else:
             cmd(RTC.setRTCTime1(setTime))
             cmd(RTC.setRTCTime2())
-            cmd("hwclock")
+            cmd(SomeUseCmd.getDate())
             while True:
                 showinfo("Prompt","请重启设备！")
         pass
@@ -762,7 +768,7 @@ def test_all_init():
             item["testState"] = recoverData[i]
             item["widget"].setState(recoverData[i])
             i = i + 1
-    title.config(text = "工厂测试项目\nMac:" + getCpuNumber())
+    title.config(text = "工厂测试项目（副板）\nMac:" + getCpuNumber() + "\n系统版本:" + getSysVersion())
     autoTest()
 
     pass
